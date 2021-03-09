@@ -286,14 +286,6 @@ video {
   background-color: red;
 }
 
-/* .home {
-  position: relative;
-  border: 1px solid red;
-  float: left;
-  display: grid;
-  grid-template-columns: 50% 30%;
-  grid-column-gap: 10%;
-} */
 @media only screen and (max-width: 1000px) {
   #eachcol {
     position: relative;

@@ -12,41 +12,38 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.core.paginator import Paginator
 from django.shortcuts import render
 import json
-from .decorations import allowed_users,isUserauthenticated,isUserauthenticatedorAdmin
-from django.views.generic import ListView, DetailView,DeleteView, CreateView,UpdateView
+from .decorations import allowed_users, isUserauthenticated, isUserauthenticatedorAdmin
+from django.views.generic import ListView, DetailView, DeleteView, CreateView, UpdateView
+
 
 class PostListView(ListView):
-	model=postList
+    model = postList
 
-	template_name='/home/alex/Documents/soc-med/templates/home.html'
-	context_object_name='posts'
-	ordering=['-created_date']
-	paginate_by=5
+    template_name = '/home/alex/Documents/soc-med/templates/home.html'
+    context_object_name = 'posts'
+    ordering = ['-created_date']
+    paginate_by = 5
 
 # Create your views here.
 
 
 def home(request):
-    
+
     page_obj = postList.objects.all()
     paginator = Paginator(page_obj, 5)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     com = yorum.objects.all()
-    bos_list = []
+    empty_list = []
     dict_list = []
     for ids in postList.objects.all():
-        bos_list.append(ids.id)
+        empty_list.append(ids.id)
 
     for id_index in range(len(bos_list)):
-        post_instance = get_object_or_404(postList, id=bos_list[id_index])
+        post_instance = get_object_or_404(postList, id=empty_list[id_index])
         num_comment_by_id = yorum.objects.filter(post_id=post_instance).count()
         dict_list.append(
-            ((bos_list[id_index]), (num_comment_by_id)))
-
-    # total_comment_dict = dict(dict_list)
-
-    # print('total_comment_dict', dict_list)
+            ((empty_list[id_index]), (num_comment_by_id)))
 
     query = request.GET.get('q')
     if query:
@@ -62,30 +59,27 @@ def home(request):
     post_latest = paginator.get_page(page_number)
     total_comment = dict(dict_list)
 
-    print('total_comment', com)
-
     return render(request, 'home.html', {'posts':  page_obj, 'post_latest': post_latest, 'UserProfile': UserProfile, 'comments': com, 'total_comment': total_comment})
 
 
 @login_required
 def post_detail(request, id):
-    po = postList.objects.get(id=id)
-    comment = yorum.objects.filter(post_id=po)
+    posts = postList.objects.get(id=id)
+    comment = yorum.objects.filter(post_id=posts)
     total = {'total': len(comment)}
-    return render(request, 'detail.html', {'post': po, 'yorum': total,  'comments': comment})
+    return render(request, 'detail.html', {'post': posts, 'yorum': total,  'comments': comment})
 
 
 @login_required
 def logout(request):
-    print('clicked')
     return logout()
 
 
 @login_required
 def comment_detail(request, id):
-    po = yorum.objects.filter(post_id=id).count()
-    print('po', po)
-    return po
+    user_post = yorum.objects.filter(post_id=id).count()
+
+    return user_post
 
 
 @login_required
@@ -106,27 +100,23 @@ def post_update(request, id):
 
 
 @login_required
-
 def post_delete(request, id):
-    po = get_object_or_404(postList, id=id)
-    form = postForm(request.POST or None, instance=po)
-    if form.instance.author != request.user  or request.user.is_superuser:
-        messages.error(request, 'You try to change the post, which not belong to you!')
+    user_post = get_object_or_404(postList, id=id)
+    form = postForm(request.POST or None, instance=user_post)
+    if form.instance.author != request.user or request.user.is_superuser:
+        messages.error(
+            request, 'You try to change the post, which not belong to you!')
         logout(request)
         return redirect('login')
     else:
-        po.delete()
+        user_post.delete()
     return redirect('home')
 
 
 @login_required
-
-
-# @allowed_users(allowed_roles=['admin'])
-
 def comments_delete(request, id):
-    po = get_object_or_404(yorum, id=id)
-    form = postForm(request.POST or None, instance=po)
+    user_post = get_object_or_404(yorum, id=id)
+    form = postForm(request.POST or None, instance=user_post)
     if form.instance.author != request.user or request.user.is_superuser:
         messages.error(
             request, 'You try to change the post, which not belong to you!')
@@ -142,18 +132,16 @@ def comments_create(request):
     comment = request.POST.get('comm')
     user_id = request.POST.get('user_id')
     post_id = request.POST.get('post_id')
-    po = get_object_or_404(postList, id=int(post_id))
-    if comment==" Enter your comments ...":
+    user_post = get_object_or_404(postList, id=int(post_id))
+    if comment == " Enter your comments ...":
         return redirect('home')
 
     try:
         saving_ = yorum.objects.create(
-            user_id=request.user, post_id=po, comments=comment)
-        print('se', saving_)
+            user_id=request.user, post_id=user_post, comments=comment)
 
     except Exception as identifier:
-        print('identifier', identifier)
-    print('data', comment, 'user_id', user_id, 'post_id', post_id)
+        print("")
     return redirect('home')
 
 
@@ -176,7 +164,6 @@ def user_profil(request, username, id):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
-
     user_profile = get_object_or_404(UserProfile, user_id=id)
     total_comment = []
     posts = postList.objects.all().filter(author__username__icontains=username)
@@ -189,18 +176,16 @@ def user_profil(request, username, id):
     total_dict = dict(total_comment)
     context = {}
     context['posts'] = posts
-    # post_2 = {'user': 'hayyam'}
     context['post_2'] = user_profile
     context['comments'] = comments
     context['totalComment'] = total_dict
-    context['page_obj']=page_obj
+    context['page_obj'] = page_obj
 
     return render(request, 'profile.html', context=context)
 
 
 @login_required
 def post_likes(request):
-    # iterlists()
     user = request.user
     comin = dict(request.POST)
     if request.method == 'POST':

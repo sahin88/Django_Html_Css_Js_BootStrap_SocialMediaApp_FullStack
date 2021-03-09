@@ -48,13 +48,3 @@ class comments(models.Model):
 
     class Meta:
         ordering = ('-created_date', )
-
-
-# class Like(models.Model):
-#     user_likes = models.ForeignKey(User, on_delete=models.CASCADE)
-#     post = models.ForeignKey(postList, on_delete=models.CASCADE)
-#     value = models.CharField(choices=STATUS_LIKES,
-#                              default='Like', max_length=10)
-
-#     def __str__(self):
-#         return str(self.post)

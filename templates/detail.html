@@ -71,12 +71,9 @@
           {%csrf_token%}
           {%if user in post.likes.all%}
              <button  type="submit"><i id='thumbs'  class="fas fa-thumbs-up"></i></a></button>
-            
-              <!-- <button></button><i class="far fa-bookmark"></i></button> -->
+
           {%else%}
              <button  type="submit"><i id='thumbs'  class="far fa-thumbs-up"></i></button>
-           
-             <!-- <button><i class="far fa-bookmark"></i></button> -->
           {%endif%}
          
        </form>
@@ -193,7 +190,7 @@
           }
           },
           error:function(error){
-            console.log('erooooor',error)
+            console.log('eror',error)
           }
         })
   
@@ -201,15 +198,6 @@
   });
   </script>
   {% endblock scripts%}
-
-
-
-
-
-
-
-
-
 </body>
 
 {% endblock %}
