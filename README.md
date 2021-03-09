@@ -1,5 +1,7 @@
 # Django_Html_Css_Js_BootStrap_SocialMediaApp_FullStack
 
+## Live Demos :[To see the leve demo please click!](https://soc-med.herokuapp.com/)
+
 ## Features
   -  Django 3.1.7
   -  PostgreSQL database support with psycopg2.
