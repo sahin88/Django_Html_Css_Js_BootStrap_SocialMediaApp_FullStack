@@ -1,0 +1,65 @@
+{% extends 'base.html' %} {% load crispy_forms_tags %} {% block content%}
+
+<div class="row justify-content-center">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <h2>Article List!</h2>
+        <a class="btn btn-primary btn-sm mb-3" href="{% url 'article-upload'%}"
+          >Upload File</a
+        >
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Cover</th>
+              <th>Title</th>
+              <th>Author</th>
+              <th>Download</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for article in articles %}
+            <tr>
+              <td>
+                {% if article.cover%}
+                <img
+                  src="{{ article.cover.url }}"
+                  alt="{{ article.title}}"
+                  style="width: 100px;"
+                />
+                {%else%}
+                <span class="text-muted"> No Cover</span>
+                {% endif %}
+              </td>
+              <td>{{ article.title }}</td>
+              <td>{{ article.author }}</td>
+              <td>
+                <a
+                  href="{{ article.file.url }}"
+                  class="btn btn-primary btn-sm"
+                  target="_blank"
+                  >Download</a
+                >
+              </td>
+              <td>
+                <form
+                  method="post"
+                  action="{% url 'delete_article' article.pk %}"
+                >
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-danger btn-sm">
+                    Delete
+                  </button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+{%endblock%}

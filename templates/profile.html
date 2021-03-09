@@ -1,0 +1,280 @@
+{%extends 'base.html'%} {% block content%}
+<div class="container">
+  <div class="profile">
+    <div class="col-md">
+      <div class="profile-sidebar">
+        <!-- SIDEBAR USERPIC -->
+            <div class="profile-one">
+                <div class="profile-userpic">
+                  <img
+                    src="{{post_2.image.url}}"
+                    class="img-responsive"
+                    width="200"
+                    alt=""
+                    style="border-radius: 20%;"/>
+                  <br />
+                </div><br/>
+
+                <div class="profile-usertitle">
+                  <div class="profile-usertitle-name">
+                    {{post_2.user}}
+                  </div>
+                </div><br/>
+                <div class="profile-usertitle-job">
+                    {{post_2.status}}
+                </div><br />
+                <div class="profile-usertitle-job">
+                    <i class="fas fa-map-marker-alt"> </i>  {{post_2.city}}
+                </div><br/>
+                <div class="profile-userbuttons">
+                    {% if user == post_2.user %}
+                    <a  href="{% url 'profile_update' id=user.id %}" class="btn btn-primary btn-sm">
+                      Update my Profile
+                    </a>
+                    {%else%}
+                      {% if post_2.user not in request.user.userprofile.friends.all %}
+                      <form  method="post" action="{% url 'follow' username=post_2.user %}" >
+                        {% csrf_token %}
+                      <button type="submit" class="btn btn-success btn-sm m-2">Follow</button>
+                    </form>
+                    <form  method="post" action="{% url 'email' username=post_2.user %}" >
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-primary btn-sm m-2">Message</button>
+                      </form>
+                          {%else%}
+                          <form  method="post" action="{% url 'f_unfollow' username=post_2.user %}" >
+                              {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm m-2">Unfollow</button>
+                          </form>
+                          <form  action="{% url 'email' username=post_2.user  %}"  method="POST">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary btn-sm m-2">Message</button>
+                          </form>
+                        
+                          {%endif%}
+                        {% endif %}
+                </div>
+            </div><!--  profile-usertitle-name -->
+    
+            <div class="profile-two" >Total Friends {{post_2.user.userprofile.friends.all.count}}
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Cover</th>
+                        <th>Title</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for latest in post_2.user.userprofile.friends.all %}
+                      <tr>
+                        <td>
+                          {% if latest.userprofile.image%}
+                          <img
+                            src="{{ latest.userprofile.image.url }}"
+                            alt="{{ latest.caption}}"
+                            style="width: 64px; border-radius: 50%;"
+                          />
+                          {%else%}
+                          <span class="text-muted"> No Cover</span>
+                          {% endif %}
+                        </td>
+                        <td>{{ latest|safe|slice:10 }}</td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+
+                  
+                </div>
+                  <!-- END MENU -->
+      </div>
+    </div>
+  </div>
+    <!-- <div class="col-md-12">
+      <div class="profile-content">
+        <div class="container">
+          <div class="row">-->
+              <div id="eachcol">
+              {% for post in posts %}
+
+              <div class="post-card">
+                <div class="post-card-header">
+                  <div class="post-card-header-image">
+                    <img src="{{post.author.userprofile.image.url}}" alt="" />
+                  </div>
+                  <div class="post_info">
+                    <form method="POST">
+                    <a href="{% url 'page_of_user' username=post.author id=post.author.id %}"
+                      ><h3>{{post.author}}</h3>
+                      </a>
+                    </form>
+                    <div class="post_location">{{post_2.city}}</div>
+                  </div>
+
+                  <div class="post_option">
+                    <div class="dropdown">
+                      <button
+                        class="btn dropdown-toggle"
+                        type="button"
+                        id="dropdownMenuButton"
+                        data-toggle="dropdown"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                      >
+                        <i class="fas fa-ellipsis-h"></i>
+                      </button>
+                      <div
+                        class="dropdown-menu"
+                        aria-labelledby="dropdownMenuButton"
+                      >
+                      <form method="POST">  <a
+                          class="dropdown-item"
+                          href="{% url 'post_update' id=post.id %}"
+                          >Update</a
+                        >
+                      </form>
+                        <div class="dropdown-divider"></div>
+                        <a
+                          class="dropdown-item"
+                          href="{%url 'post_delete' id=post.id %}"
+                          >Delete</a
+                        >
+                        <div class="dropdown-divider"></div>
+                        <a
+                          class="dropdown-item"
+                          href="{% url 'post_detail' id=post.id %}"
+                          >Detail</a
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="caption">
+                  <span><p>{{post.caption|safe|slice:":200"}}</p></span>
+                  <a
+                    class="badge badge-secondary"
+                    href="{% url 'post_detail' post.id  %}"
+                    >Read More!</a
+                  >
+                </div>
+                <div class="post_image">
+                  {%if post.image%}
+                  <img src="{{post.image.url}}" />
+                  {% elif post.video%}
+                  <video autoplay controls>
+                    <source src="{{post.video.url}}" type="video/mp4" />
+                  </video>
+                  {%endif%} {%if post.video_link%}
+                  <div class="post_yt_video">
+                    <iframe
+                      width="484"
+                      height="315"
+                      src="{{ post.video_link }}"
+                      frameborder="0"
+                      allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                      allowfullscreen
+                    ></iframe>
+                  </div>
+                  {%endif%}
+                </div>
+                <div class="post-likes"><a href="#">{{post.likes.all.count}} Total Likes</a>
+                {% for key, values in totalComment.items %}
+                {% if key == post.id %}
+                <a href="url 'post_detail' id=post.id">{{values}} Total Comments</a>
+                {% endif %}
+                {% endfor %}
+              </div>
+                <div class="post_engagements">
+                  <a href="#"><i class="far fa-thumbs-up"></i></a>
+                  <a href="#"><i class="far fa-comments"></i></a>
+                  <a href="#"><i class="fas fa-share-square"></i></a>
+                  <a href="#"><i class="far fa-bookmark"></i></a>
+                </div>
+
+                <div>
+                  <div class="time_posted">
+                    {{post.created_date| timesince}} ago
+                  </div>
+                </div>
+              </div>
+              {%endfor%}
+
+              <div class="pagination">
+                <span class="step-links">
+                    {% if page_obj.has_previous %}
+                        <a class="btn btn-outline-info mb-4" href="?page=1">&laquo; first</a>
+                        <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.previous_page_number }}">previous</a>
+                    {% endif %}
+              
+                    <span class="btn btn-success mb-4"  >
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                    </span>
+              
+                    {% if page_obj.has_next %}
+                        <a  class="btn btn-outline-info mb-4" href="?page={{ posts.next_page_number }}">next</a>
+                        <a  class="btn btn-outline-info mb-4" href="?page={{ posts.paginator.num_pages }}">last &raquo;</a>
+                    {% endif %}
+                </span>
+              </div>SS
+             </div>
+            </div>
+          </div>
+        </div>
+        
+      </div> -->
+     
+      {%block scripts%}
+<script>
+  
+  $(document).ready(function() { 
+    $('.formClass').submit(function(event){
+      
+      event.preventDefault()
+      var post_id=$(this).attr('id')
+      var form_url=$('.formClass').attr('action')
+    
+      $.ajax({
+        type:'POST',
+        url: form_url,
+        data:{
+          'csrfmiddlewaretoken':$('input[name=csrfmiddlewaretoken]').val(),
+         'post_id':post_id
+        },
+
+        success:function() {
+       //btn.classList.contains('far')
+        let btn=document.getElementById(post_id)
+        let icon=btn.childNodes[5].childNodes[0]
+        console.log('btn', btn.childNodes[5].childNodes[0].id )
+        if (icon.classList.contains('far') & icon.classList.contains('fa-thumbs-up') && icon.id==='thumbs'){
+          
+          icon.classList.remove('fa-thumbs-up')
+          icon.classList.remove('far')
+          console.log('btn_iff', btn.childNodes[5].childNodes[0])
+          icon.className ='fas fa-thumbs-up'
+        }else{
+          icon.classList.remove('fas')
+          icon.classList.remove('fa-thumbs-up')
+          icon.className='far fa-thumbs-up'
+
+        }
+        },
+        error:function(error){
+          console.log('erooooor',error)
+        }
+      })
+
+    })
+});
+</script>
+{% endblock %}
+      <!--                                                             -->
+        <br />
+        <br />
+      
+        
+        {% endblock%}
+      </div>
+    </div>
+  </div>
+</div>

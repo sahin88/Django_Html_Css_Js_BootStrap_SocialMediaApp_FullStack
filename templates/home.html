@@ -1,0 +1,309 @@
+{%extends 'base.html'%} {% block content%} {% load static%}
+<body>
+  <link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}" />
+ 
+        <div >
+     
+        {%for post in posts%}
+        <div id="eachcol">
+        <div class="post-card">
+          <div class="post-card-header">
+            <div class="post-card-header-image">
+              <img src="{{post.author.userprofile.image.url}}" alt="" />
+            
+            <div class="post_info">
+              <form method="post">
+                {% csrf_token %}
+                <a
+                  href="{% url 'page_of_user' username=post.author id=post.author.id %}"
+                  ><h3>{{post.author.username}}</h3></a
+                >
+              </form>
+              <div class="post_location">{{post.author.userprofile.city}}</div>
+            </div>
+            </div>
+            <div class="post_option">
+              <div class="dropdown">
+                <button
+                  class="btn dropdown-toggle"
+                  type="button"
+                  id="dropdownMenuButton"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  <i class="fas fa-ellipsis-h"></i>
+                </button>
+                <div class="dropdown-menu"  aria-labelledby="dropdownMenuButton">
+                  <a
+                    class="dropdown-item"
+                    href="{% url 'post_update' id=post.id %}"
+                    >Update</a
+                  >
+                  <div class="dropdown-divider"></div>
+                  <a
+                    class="dropdown-item"
+                    href="{%url 'post_delete' id=post.id %}"
+                    >Delete</a
+                  >
+                  <div class="dropdown-divider"></div>
+                  <a
+                    class="dropdown-item"
+                    href="{% url 'post_detail' id=post.id %}"
+                    >Detail</a
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="caption">
+            <span><p>{{post.caption|safe|slice:":200"}}</p></span>
+            <a
+              class="badge badge-secondary"
+              href="{% url 'post_detail' post.id  %}"
+              >Read More!</a
+            >
+          </div>
+         
+          <div class="post_image">
+            {%if post.image%}
+            <img src="{{post.image.url}}" />
+            {% elif post.video%}
+            <video autoplay controls>
+              <source src="{{post.video.url}}" type="video/mp4" />
+            </video>
+            {%endif%} {%if post.video_link%}
+            <div class="post_yt_video">
+              <iframe
+                width="484"
+                height="315"
+                src="{{ post.video_link }}"
+                frameborder="0"
+                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+              ></iframe>
+            </div>
+            {%endif%}
+          </div>
+          <div class="post-likes"><a href="#">{{post.likes.all.count}} like</a>
+            {% for key, values in total_comment.items %}
+          
+            {% if key == post.id %}
+               <a href="{% url 'post_detail' id=post.id %}"> {{values}} Comments</a>
+            {%endif%}
+          {% endfor %}
+          <a> Shares</a>
+          </div>
+          <div class="post_engagements">
+            <form action="{% url 'post_like' %}" id={{post.id}} class="formClass" method="POST">
+              <input type="hidden", name="post_id", value="{{post.id}}">
+              
+              {%csrf_token%}
+              {%if user in post.likes.all%}
+                 <button  type="submit"><i id='thumbs'  class="fas fa-thumbs-up"></i></a></button>
+                
+                  <!-- <button></button><i class="far fa-bookmark"></i></button> -->
+              {%else%}
+                 <button  type="submit"><i id='thumbs'  class="far fa-thumbs-up"></i></button>
+               
+                 <!-- <button><i class="far fa-bookmark"></i></button> -->
+              {%endif%}
+             
+           </form>
+           <form action="#">
+             <button><i class="far fa-comments"></i></button>
+          </form>
+          <form action="#">
+           <button><i class="fas fa-share-square"></i></button>
+          </form>
+
+
+          </div>
+
+          <div>
+            <div class="time_posted">
+              {{post.created_date | timesince}} ago
+            </div>
+          </div>
+        </div>
+        <!-- POsttttttttttttttttttttttttttttttttttttt -->
+
+        <div class="commencento_frame">
+         
+         
+          {%for comment in comments%}
+        
+            {% if comment.post_id.id == post.id %}
+            <!-- <a href="{% url 'comment_detail' comment.post_id.id %}" >Comments</a> -->
+            
+           
+              <div class="commencento">
+                <div class='name_time_drop'>
+                  <p>{{comment.user_id}} | {{ comment.created_date| timesince}} ago </p> 
+                  
+                  <div>
+                    <div class="dropdown">
+                      <button
+                        class="btn dropdown-toggle"
+                        type="button"
+                        id="dropdownMenuButton"
+                        data-toggle="dropdown"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                      >
+                        <i class="fas fa-ellipsis-h"></i>
+                      </button>
+                      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                
+                        <a
+                          class="dropdown-item"
+                          href="{%url 'comments_delete' id=comment.id %}"
+                          >Delete</a
+                        >
+                     
+                     
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class='pict_and_com'>
+                  <img src='{{comment.user_id.userprofile.image.url}}'
+                    class="img-responsive"
+                    width="40"
+                    height="40"
+            
+                    alt=""
+                    style="border-radius: 50%;">
+                  <p>{{comment.comments}}</p>
+                 
+                </div>
+              </div>
+       
+              <!-- Commentssssssssssssssssssssssssssssssssssssss -->
+            {%endif%}
+          
+            {%endfor%}
+          </div>
+            <div class="post_form">
+              <form
+              method="post"
+              action="{% url 'comments_create' %}">
+              {% csrf_token %}
+              <input type="hidden" name=user_id value= {{comment.user_id}} >
+              <input type="hidden" name=post_id value= {{post.id}} >
+              <div class="button_input">
+                <!-- <input type="text" name=comm  value placeholder="please enter your comment"> -->
+                <textarea class="mb-1" name='comm'  style="width:100%" rows="4" > Enter your comments ...</textarea> 
+              
+                <button type="Send" style="width:100%"   class="btn btn-warning btn-lg btn-block">
+                  Post
+                </button>
+              </div>
+            </form>
+           </div>
+          </div>
+           {% endfor %}
+       
+
+     
+     
+      <!-- <div class="latest_post lastest_post_1">
+        Latest three Post
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Cover</th>
+              <th>Title</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for latest in post_latest %}
+            <tr>
+              <td>
+                {% if latest.image%}
+                <img
+                  src="{{ latest.image.url }}"
+                  alt="{{ latest.caption}}"
+                  style="width: 64px;"
+                />
+                {%else%}
+                <span class="text-muted"> No Cover</span>
+                {% endif %}
+              </td>
+              <td>{{ latest.caption|safe|slice:10 }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div> -->
+
+    </div> 
+</body>
+
+{%block scripts%}
+<script>
+  
+  $(document).ready(function() { 
+    $('.formClass').submit(function(event){
+      
+      event.preventDefault()
+      var post_id=$(this).attr('id')
+      var form_url=$('.formClass').attr('action')
+      console.log("neden calismiyor")
+      $.ajax({
+        type:'POST',
+        url: form_url,
+        data:{
+          'csrfmiddlewaretoken':$('input[name=csrfmiddlewaretoken]').val(),
+         'post_id':post_id
+        },
+
+        success:function() {
+       //btn.classList.contains('far')
+        let btn=document.getElementById(post_id)
+        let icon=btn.childNodes[5].childNodes[0]
+        console.log('btn', btn.childNodes[5].childNodes[0].id )
+        if (icon.classList.contains('far') & icon.classList.contains('fa-thumbs-up') && icon.id==='thumbs'){
+          
+          icon.classList.remove('fa-thumbs-up')
+          icon.classList.remove('far')
+          console.log('btn_iff', btn.childNodes[5].childNodes[0])
+          icon.className ='fas fa-thumbs-up'
+        }else{
+          icon.classList.remove('fas')
+          icon.classList.remove('fa-thumbs-up')
+          icon.className='far fa-thumbs-up'
+
+        }
+        },
+        error:function(error){
+          console.log('erooooor',error)
+        }
+      })
+
+    })
+});
+</script>
+{% endblock scripts%}
+
+<div class="pagination">
+  <span class="step-links">
+      {% if posts.has_previous %}
+          <a class="btn btn-outline-info mb-4" href="?page=1">&laquo; first</a>
+          <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.previous_page_number }}">previous</a>
+      {% endif %}
+
+      <span class="btn btn-success mb-4"  >
+          Page {{ posts.number }} of {{ posts.paginator.num_pages }}.
+      </span>
+
+      {% if posts.has_next %}
+          <a  class="btn btn-outline-info mb-4" href="?page={{ posts.next_page_number }}">next</a>
+          <a  class="btn btn-outline-info mb-4" href="?page={{ posts.paginator.num_pages }}">last &raquo;</a>
+      {% endif %}
+  </span>
+</div>
+
+
+{% endblock%}
