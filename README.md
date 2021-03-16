@@ -10,7 +10,7 @@
   -  User registration, logging
   -  Custom User Model
 
-## Uml 
+## Er Diagramm 
 ![alt text](https://github.com/sahin88/Django_Html_Css_Js_BootStrap_SocialMediaApp_FullStack/blob/main/app_models_uml.png)
 
 
